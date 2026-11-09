@@ -157,3 +157,7 @@
 ## Bundle Algorithms
 
 [bundle_pop_youshu.py](bundle_pop_youshu.py) - Example of bundle popularity baselines (BundlePop) for bundle recommendation, completion and construction.
+
+[bundle_crosscbr_youshu.py](bundle_crosscbr_youshu.py) - Example of Cross-view Contrastive Bundle Recommendation (CrossCBR).
+
+[bundle_repro.py](bundle_repro.py) - Reproducibility runs of the graph bundle recommenders (official configs, equal-budget tuning, multiple seeds).

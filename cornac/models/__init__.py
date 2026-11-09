@@ -42,6 +42,7 @@ from .companion import Companion
 from .comparer import ComparERObj
 from .comparer import ComparERSub
 from .conv_mf import ConvMF
+from .crosscbr import CrossCBR
 from .ctr import CTR
 from .cvae import CVAE
 from .cvaecf import CVAECF

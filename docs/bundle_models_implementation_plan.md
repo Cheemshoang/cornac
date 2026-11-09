@@ -107,8 +107,9 @@ listed below. They go into the example scripts, not into class defaults.
   Search spaces are centred on the official configs and published.
 - **Rule 4 (evaluation):** validation-only checkpoint selection, full catalog, 5 seeds, mean ± std.
 - **Rule 5 (pipeline):**
-  - One script per model, `examples/bundle_<m>_repro.py`, from the checklist template, which saves
-    the config, environment and logs.
+  - One shared script, `examples/bundle_repro.py --model <M> --dataset <D> [--official] [--tune N --baselines]`,
+    built from the checklist template. It holds every model's official configs, paper targets and
+    search spaces, and saves the config, environment, per-seed results and logs.
   - One quick-start per model, `examples/bundle_<m>_youshu.py`.
   - Results go into `docs/bundle_models_reproduction.md` using the reporting template.
 
@@ -156,7 +157,7 @@ All six use embedding size 64, lr 1e-3 and batch 2048, except where a row says o
 | Phase | Item | Status |
 |---|---|---|
 | 0 | `bundle_utils` + LightGCN/NGCF `return self` fix + tests | ✅ code + tests (dgl-dependent LightGCN/NGCF checks skip without dgl) |
-| 1 | CrossCBR | ☐ |
+| 1 | CrossCBR | ✅ code + tests; Youshu smoke run (10 epochs) OK; full reproduction pending |
 | 2 | BGCN | ☐ |
 | 3 | MultiCBR | ☐ |
 | 4 | BunCa | ☐ |

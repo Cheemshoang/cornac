@@ -36,6 +36,11 @@ Disentangled Multimodal Representation Learning for Recommendation (DMRL)
 .. automodule:: cornac.models.dmrl.recom_dmrl
    :members:
 
+CrossCBR: Cross-view Contrastive Learning for Bundle Recommendation (CrossCBR)
+-----------------------------------------------------------------------------
+.. automodule:: cornac.models.crosscbr.recom_crosscbr
+   :members:
+
 Bilateral VAE for Collaborative Filtering (BiVAECF)
 ---------------------------------------------------
 .. automodule:: cornac.models.bivaecf.recom_bivaecf

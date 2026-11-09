@@ -13,7 +13,6 @@ import numpy as np
 import pytest
 import scipy.sparse as sp
 
-from cornac.eval_methods import BundleEvaluation
 from cornac.models.bundle_utils import (
     BundleTorchRecommender,
     bi_norm,
@@ -24,33 +23,7 @@ from cornac.models.bundle_utils import (
 )
 from cornac.models.bundle_utils.graph import sample_negatives
 
-
-def toy_bundle_data(seed=0, users=12, bundles=10, items=15):
-    """Small random catalog and user-bundle splits for bundle model tests."""
-    rng = np.random.RandomState(seed)
-    catalog = []
-    for b in range(bundles):
-        for i in rng.choice(items, size=3, replace=False):
-            catalog.append(("b%d" % b, "i%d" % i))
-    pairs = sorted({(u, b) for u in range(users)
-                    for b in rng.choice(bundles, size=4, replace=False)})
-    rows = [("u%d" % u, "b%d" % b, 1.0) for u, b in pairs]
-    rng.shuffle(rows)
-    n = len(rows)
-    train, val, test = rows[: n * 6 // 10], rows[n * 6 // 10: n * 8 // 10], rows[n * 8 // 10:]
-    user_items = [("u%d" % u, "i%d" % rng.randint(items), 1.0) for u in range(users)
-                  for _ in range(3)]
-    return train, val, test, catalog, user_items
-
-
-def toy_evaluation(seed=0, with_user_items=True):
-    train, val, test, catalog, user_items = toy_bundle_data(seed)
-    return BundleEvaluation.from_splits(
-        train_data=train, val_data=val, test_data=test,
-        bundle_item_data=catalog,
-        user_item_data=user_items if with_user_items else None,
-        test_mask="train", exclude_unknowns=True, seed=seed,
-    )
+from ._bundle_checks import toy_evaluation
 
 
 # ---------------------------------------------------------------- graph helpers
