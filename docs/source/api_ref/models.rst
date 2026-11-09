@@ -51,6 +51,11 @@ MultiCBR: Multi-view Contrastive Learning for Bundle Recommendation (MultiCBR)
 .. automodule:: cornac.models.multicbr.recom_multicbr
    :members:
 
+Bundle Recommendation with Item-level Causation-enhanced Multi-view Learning (BunCa)
+------------------------------------------------------------------------------------
+.. automodule:: cornac.models.bunca.recom_bunca
+   :members:
+
 Bilateral VAE for Collaborative Filtering (BiVAECF)
 ---------------------------------------------------
 .. automodule:: cornac.models.bivaecf.recom_bivaecf

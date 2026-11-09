@@ -29,7 +29,8 @@ Reproduce CrossCBR on Youshu with the official configuration and 5 seeds::
 
     python examples/bundle_repro.py --model CrossCBR --dataset Youshu
 
-Run the released-code variant of a model with a known code/paper mismatch::
+Run the released-code variant of a model with a known code/paper mismatch
+(``official_variant=True`` and/or the released per-dataset settings)::
 
     python examples/bundle_repro.py --model MultiCBR --dataset NetEase --official
 
@@ -84,6 +85,34 @@ CONFIGS = {
                          ui_layer_weights=(0.3, 0.2, 0.5), bi_layer_weights=(0.5, 0.5, 0.0),
                          c_lambda=0.1, c_temp=0.2, num_epochs=50),
     },
+    "BunCa": {
+        "Youshu": dict(num_layers=1, lambda_reg=1e-4, item_dropout=0.2, bundle_dropout=0.2,
+                       agg_dropout=0.2, c_lambda=0.04, c_temp=0.25, num_heads=2,
+                       iui_threshold=4, ibi_threshold=4, hyper_threshold=4,
+                       coherent_weights=(0.9, 0.9), num_epochs=100),
+        "NetEase": dict(num_layers=1, lambda_reg=1e-4, item_dropout=0.1, bundle_dropout=0.3,
+                        agg_dropout=0.1, c_lambda=0.1, c_temp=0.25, num_heads=2,
+                        iui_threshold=9, ibi_threshold=10, hyper_threshold=2,
+                        coherent_weights=(0.8, 0.8), num_epochs=200),
+        "iFashion": dict(num_layers=1, lambda_reg=4e-5, item_dropout=0.2, bundle_dropout=0.2,
+                         agg_dropout=0.0, c_lambda=0.25, c_temp=0.2, num_heads=5,
+                         iui_threshold=15, ibi_threshold=2, hyper_threshold=4,
+                         coherent_weights=(0.9, 0.9), cohesive_weights=(0.6, 0.6),
+                         batch_size=12000, num_epochs=70),
+    },
+}
+
+# Released-code settings applied by --official on top of CONFIGS, for models whose
+# code/paper mismatch is a matter of configuration rather than code.
+OFFICIAL = {
+    "BunCa": {
+        "Youshu": dict(attn_weight=1.0, residual_weight=0.0, hyper_threshold=10000,
+                       contrast_weights=(0.5, 0.5, 0.0, 0.0)),
+        "NetEase": dict(attn_weight=1.0, residual_weight=0.0,
+                        contrast_weights=(0.3, 0.3, 0.2, 0.2)),
+        "iFashion": dict(attn_weight=0.1, residual_weight=0.9,
+                         contrast_weights=(0.25, 0.25, 0.25, 0.25)),
+    },
 }
 
 # Published test Recall@20 / NDCG@20 of each model (Rule 2 reference check).
@@ -96,6 +125,9 @@ PAPER = {
     ("MultiCBR", "Youshu"): (0.2842, 0.1693),
     ("MultiCBR", "NetEase"): (0.0907, 0.0494),
     ("MultiCBR", "iFashion"): (0.1500, 0.1203),
+    ("BunCa", "Youshu"): (0.2978, 0.1762),
+    ("BunCa", "NetEase"): (0.0899, 0.0479),
+    ("BunCa", "iFashion"): (0.1431, 0.1123),
 }
 
 # RandomSearch spaces (Rule 3), centred on the official settings.
@@ -121,6 +153,15 @@ SPACES = {
         Discrete("view_eps", [(0.0, 0.0, 0.0), (0.1, 0.1, 0.1), (0.2, 0.1, 0.1), (0.0, 0.0, 0.2)]),
         Discrete("modal_weights", [(1 / 3, 1 / 3, 1 / 3), (0.35, 0.15, 0.5), (0.5, 0.2, 0.3),
                                    (0.1, 0.2, 0.7)]),
+    ],
+    "BunCa": [
+        Continuous("lambda_reg", 1e-6, 1e-3),
+        Continuous("c_lambda", 0.01, 0.5),
+        Discrete("c_temp", [0.1, 0.15, 0.2, 0.25, 0.3]),
+        Discrete("residual_weight", [0.0, 0.5, 1.0]),
+        Discrete("contrast_weights", [(0.5, 0.5, 0, 0), (0.25, 0.25, 0.25, 0.25),
+                                      (0.3, 0.3, 0.2, 0.2)]),
+        Discrete("hyper_threshold", [2, 4, 10000]),
     ],
 }
 
@@ -204,9 +245,13 @@ def main():
     if args.official:
         import inspect
 
-        if "official_variant" not in inspect.signature(model_cls.__init__).parameters:
-            parser.error("{} has no official_variant switch".format(args.model))
-        config["official_variant"] = True
+        has_switch = "official_variant" in inspect.signature(model_cls.__init__).parameters
+        overrides = OFFICIAL.get(args.model, {}).get(args.dataset)
+        if not has_switch and overrides is None:
+            parser.error("{} has no released-code variant".format(args.model))
+        if has_switch:
+            config["official_variant"] = True
+        config.update(overrides or {})
     eval_method = load_evaluation(args.dataset)
 
     run_dir = os.path.join(args.out, "{}_{}{}".format(

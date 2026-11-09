@@ -164,4 +164,6 @@
 
 [bundle_multicbr_youshu.py](bundle_multicbr_youshu.py) - Example of Multi-view Contrastive Bundle Recommendation (MultiCBR).
 
+[bundle_bunca_youshu.py](bundle_bunca_youshu.py) - Example of Bundle Recommendation with Item-level Causation-enhanced Multi-view Learning (BunCa).
+
 [bundle_repro.py](bundle_repro.py) - Reproducibility runs of the graph bundle recommenders (official configs, equal-budget tuning, multiple seeds).
