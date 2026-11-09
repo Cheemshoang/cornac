@@ -70,6 +70,20 @@ CONFIGS = {
                       node_dropout=0.0, num_epochs=1000, eval_every=5, patience=10)
         for dataset in ("Youshu", "NetEase", "iFashion")
     },
+    "MultiCBR": {
+        "Youshu": dict(num_layers=2, lambda_reg=1e-5, view_eps=(0.2, 0.1, 0.1),
+                       modal_weights=(0.35, 0.15, 0.5), ub_layer_weights=(0.7, 0.2, 0.1),
+                       ui_layer_weights=(0.6, 0.2, 0.2), bi_layer_weights=(0.6, 0.1, 0.3),
+                       c_lambda=0.04, c_temp=0.23, num_epochs=100),
+        "NetEase": dict(num_layers=2, lambda_reg=1e-5, view_eps=(0.0, 0.0, 0.2),
+                        modal_weights=(0.5, 0.2, 0.3), ub_layer_weights=(0.35, 0.15, 0.5),
+                        ui_layer_weights=(0.25, 0.65, 0.1), bi_layer_weights=(0.4, 0.4, 0.2),
+                        c_lambda=0.05, c_temp=0.2, num_epochs=50),
+        "iFashion": dict(num_layers=2, lambda_reg=1e-5, view_eps=(0.05, 0.0, 0.15),
+                         modal_weights=(0.1, 0.2, 0.7), ub_layer_weights=(0.5, 0.5, 0.0),
+                         ui_layer_weights=(0.3, 0.2, 0.5), bi_layer_weights=(0.5, 0.5, 0.0),
+                         c_lambda=0.1, c_temp=0.2, num_epochs=50),
+    },
 }
 
 # Published test Recall@20 / NDCG@20 of each model (Rule 2 reference check).
@@ -79,6 +93,9 @@ PAPER = {
     ("CrossCBR", "iFashion"): (0.1173, 0.0895),
     ("BGCN", "Youshu"): (0.2347, 0.1345),
     ("BGCN", "NetEase"): (0.0491, 0.0258),
+    ("MultiCBR", "Youshu"): (0.2842, 0.1693),
+    ("MultiCBR", "NetEase"): (0.0907, 0.0494),
+    ("MultiCBR", "iFashion"): (0.1500, 0.1203),
 }
 
 # RandomSearch spaces (Rule 3), centred on the official settings.
@@ -96,6 +113,14 @@ SPACES = {
         Continuous("lambda_reg", 1e-8, 1e-4),
         Discrete("message_dropout", [0.0, 0.1, 0.2, 0.3, 0.5]),
         Discrete("num_layers", [1, 2, 3]),
+    ],
+    "MultiCBR": [
+        Continuous("lambda_reg", 1e-6, 1e-3),
+        Continuous("c_lambda", 0.01, 0.5),
+        Discrete("c_temp", [0.1, 0.15, 0.2, 0.25, 0.3]),
+        Discrete("view_eps", [(0.0, 0.0, 0.0), (0.1, 0.1, 0.1), (0.2, 0.1, 0.1), (0.0, 0.0, 0.2)]),
+        Discrete("modal_weights", [(1 / 3, 1 / 3, 1 / 3), (0.35, 0.15, 0.5), (0.5, 0.2, 0.3),
+                                   (0.1, 0.2, 0.7)]),
     ],
 }
 

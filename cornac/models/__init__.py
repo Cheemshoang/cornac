@@ -74,6 +74,7 @@ from .mf import MF
 from .mmmf import MMMF
 from .most_pop import MostPop
 from .mter import MTER
+from .multicbr import MultiCBR
 from .narre import NARRE
 from .ncf import GMF
 from .ncf import MLP

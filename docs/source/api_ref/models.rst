@@ -46,6 +46,11 @@ Bundle Recommendation with Graph Convolutional Networks (BGCN)
 .. automodule:: cornac.models.bgcn.recom_bgcn
    :members:
 
+MultiCBR: Multi-view Contrastive Learning for Bundle Recommendation (MultiCBR)
+------------------------------------------------------------------------------
+.. automodule:: cornac.models.multicbr.recom_multicbr
+   :members:
+
 Bilateral VAE for Collaborative Filtering (BiVAECF)
 ---------------------------------------------------
 .. automodule:: cornac.models.bivaecf.recom_bivaecf

@@ -157,9 +157,9 @@ All six use embedding size 64, lr 1e-3 and batch 2048, except where a row says o
 | Phase | Item | Status |
 |---|---|---|
 | 0 | `bundle_utils` + LightGCN/NGCF `return self` fix + tests | ✅ code + tests (dgl-dependent LightGCN/NGCF checks skip without dgl) |
-| 1 | CrossCBR | ✅ code + tests; Youshu smoke run (10 epochs) OK; full reproduction pending |
+| 1 | CrossCBR | ✅ code + tests; **Youshu reproduced** (1 seed, 100 epochs, CPU 13 min): R@20 0.2792 / N@20 0.1655 vs paper 0.2813 / 0.1668 (−0.8% / −0.8%); NetEase, iFashion and 5-seed runs pending |
 | 2 | BGCN | ✅ code + tests; Youshu smoke run OK (learns at lr 3e-3; official lr 3e-4 converges slowly, as the reference's 1000-epoch budget implies); full reproduction pending |
-| 3 | MultiCBR | ☐ |
+| 3 | MultiCBR | ✅ code + tests (paper and official variants); Youshu smoke run (5 epochs) OK for both; full reproduction pending |
 | 4 | BunCa | ☐ |
 | 5 | BundleGT | ☐ |
 | 6 | DCBR | ☐ |

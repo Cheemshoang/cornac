@@ -162,4 +162,6 @@
 
 [bundle_bgcn_netease.py](bundle_bgcn_netease.py) - Example of Bundle Recommendation with Graph Convolutional Networks (BGCN).
 
+[bundle_multicbr_youshu.py](bundle_multicbr_youshu.py) - Example of Multi-view Contrastive Bundle Recommendation (MultiCBR).
+
 [bundle_repro.py](bundle_repro.py) - Reproducibility runs of the graph bundle recommenders (official configs, equal-budget tuning, multiple seeds).
