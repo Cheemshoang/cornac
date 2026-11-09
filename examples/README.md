@@ -168,4 +168,6 @@
 
 [bundle_bundlegt_youshu.py](bundle_bundlegt_youshu.py) - Example of the Strategy-aware Bundle Recommender System (BundleGT).
 
+[bundle_dcbr_ifashion.py](bundle_dcbr_ifashion.py) - Example of Disentangled Contrastive Bundle Recommendation with Conditional Diffusion (DCBR).
+
 [bundle_repro.py](bundle_repro.py) - Reproducibility runs of the graph bundle recommenders (official configs, equal-budget tuning, multiple seeds).

@@ -61,6 +61,11 @@ Strategy-aware Bundle Recommender System (BundleGT)
 .. automodule:: cornac.models.bundlegt.recom_bundlegt
    :members:
 
+Disentangled Contrastive Bundle Recommendation with Conditional Diffusion (DCBR)
+--------------------------------------------------------------------------------
+.. automodule:: cornac.models.dcbr.recom_dcbr
+   :members:
+
 Bilateral VAE for Collaborative Filtering (BiVAECF)
 ---------------------------------------------------
 .. automodule:: cornac.models.bivaecf.recom_bivaecf

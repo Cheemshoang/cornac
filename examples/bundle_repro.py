@@ -112,6 +112,18 @@ CONFIGS = {
                          alpha=0.75, gcn_norm=True, lambda_reg=2e-6, num_epochs=1000,
                          eval_every=2, patience=10),
     },
+    # DCBR's repository configures iFashion only (plus MealRec+, not in Cornac); the
+    # iFashion settings are reused on Youshu and NetEase, which the paper does not report.
+    # Their strong contrastive terms (c_temp 0.08, c_lambda 0.3) stall early training on
+    # Youshu in smoke tests, so use --tune there rather than these settings.
+    "DCBR": {
+        dataset: dict(num_layers=2, ub_layer_weights=(0.5, 0.5, 0.0),
+                      ui_layer_weights=(0.3, 0.4, 0.3), bi_layer_weights=(0.5, 0.5, 0.0),
+                      view_eps=(0.05, 0.0, 0.2), omega=0.5, c_lambda=0.3, c_temp=0.08,
+                      gammas=(0.3, 0.2), lambda_reg=1e-6, diff_steps=140, noise_scale=0.1,
+                      blcc_weight=2.0, rebuild_k=1, num_epochs=50)
+        for dataset in ("Youshu", "NetEase", "iFashion")
+    },
 }
 
 # Released-code settings applied by --official on top of CONFIGS, for models whose
@@ -144,6 +156,7 @@ PAPER = {
     ("BundleGT", "Youshu"): (0.2905, 0.1737),
     ("BundleGT", "NetEase"): (0.0903, 0.0478),
     ("BundleGT", "iFashion"): (0.1263, 0.0969),
+    ("DCBR", "iFashion"): (0.1633, 0.1370),
 }
 
 # RandomSearch spaces (Rule 3), centred on the official settings.
@@ -184,6 +197,13 @@ SPACES = {
         Discrete("num_trans_layers", [1, 2, 3, 5]),
         Discrete("alpha", [0.25, 0.5, 0.75]),
         Discrete("gcn_norm", [False, True]),
+    ],
+    "DCBR": [
+        Continuous("lambda_reg", 1e-7, 1e-4),
+        Continuous("c_lambda", 0.01, 0.5),
+        Discrete("c_temp", [0.08, 0.1, 0.15, 0.2, 0.25]),
+        Discrete("omega", [0.0, 0.25, 0.5, 0.75, 1.0]),
+        Discrete("rebuild_k", [1, 5, 10]),
     ],
 }
 

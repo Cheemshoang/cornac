@@ -162,7 +162,7 @@ All six use embedding size 64, lr 1e-3 and batch 2048, except where a row says o
 | 3 | MultiCBR | ✅ code + tests (paper and official variants); Youshu smoke run (5 epochs) OK for both; full reproduction pending |
 | 4 | BunCa | ✅ code + tests (paper defaults; released switches via `bundle_repro.py --official`); Youshu smoke run (3 epochs, val R@20 0.233) OK; full reproduction pending |
 | 5 | BundleGT | ✅ code + tests (trained vs frozen attention); Youshu smoke run (3 epochs, test R@20 0.223) OK, ~200 s/epoch on CPU so GPU needed; full reproduction pending |
-| 6 | DCBR | ☐ |
+| 6 | DCBR | ✅ code + tests; Youshu smoke run: learns without / with light contrastive loss (val R@20 0.093 / 0.076 at epoch 3) but the iFashion contrastive settings stall it on Youshu, so Youshu/NetEase need `--tune`; iFashion reproduction pending (GPU) |
 
 A phase is ticked only when all 11 rows of the pre-merge gate pass and the user approves.
 
