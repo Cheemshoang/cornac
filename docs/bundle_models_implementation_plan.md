@@ -158,7 +158,7 @@ All six use embedding size 64, lr 1e-3 and batch 2048, except where a row says o
 |---|---|---|
 | 0 | `bundle_utils` + LightGCN/NGCF `return self` fix + tests | ✅ code + tests (dgl-dependent LightGCN/NGCF checks skip without dgl) |
 | 1 | CrossCBR | ✅ code + tests; Youshu smoke run (10 epochs) OK; full reproduction pending |
-| 2 | BGCN | ☐ |
+| 2 | BGCN | ✅ code + tests; Youshu smoke run OK (learns at lr 3e-3; official lr 3e-4 converges slowly, as the reference's 1000-epoch budget implies); full reproduction pending |
 | 3 | MultiCBR | ☐ |
 | 4 | BunCa | ☐ |
 | 5 | BundleGT | ☐ |

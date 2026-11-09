@@ -117,6 +117,10 @@ class BundleTorchRecommender(BundleRecommender, ANNMixin):
         """Return the torch module trained by :meth:`fit`."""
         raise NotImplementedError()
 
+    def _sample_negatives(self, positives, users, pos_bundles, epoch):
+        """Negative bundles of a batch; uniform over unobserved bundles by default."""
+        return sample_negatives(positives, users, self.rng)
+
     def _optimizer(self, module):
         """Optimizer of the module's parameters."""
         import torch
@@ -184,6 +188,14 @@ class BundleTorchRecommender(BundleRecommender, ANNMixin):
 
         module = self._build_module(train_set, device).to(device)
         optimizer = self._optimizer(module)
+        self._module = module  # available to hooks during training only
+        try:
+            return self._train(module, optimizer, train_set, val_set, device)
+        finally:
+            del self._module
+
+    def _train(self, module, optimizer, train_set, val_set, device):
+        import torch
 
         positives = binary(train_set.csr_matrix)
         pair_users, pair_bundles = positives.nonzero()
@@ -205,7 +217,9 @@ class BundleTorchRecommender(BundleRecommender, ANNMixin):
             for start in range(0, num_pairs, self.batch_size):
                 batch = order[start : start + self.batch_size]
                 users = pair_users[batch]
-                negatives = sample_negatives(positives, users, self.rng)
+                negatives = self._sample_negatives(
+                    positives, users, pair_bundles[batch], epoch
+                )
                 loss, _ = module.loss(
                     torch.as_tensor(users, dtype=torch.long, device=device),
                     torch.as_tensor(pair_bundles[batch], dtype=torch.long, device=device),

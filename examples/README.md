@@ -160,4 +160,6 @@
 
 [bundle_crosscbr_youshu.py](bundle_crosscbr_youshu.py) - Example of Cross-view Contrastive Bundle Recommendation (CrossCBR).
 
+[bundle_bgcn_netease.py](bundle_bgcn_netease.py) - Example of Bundle Recommendation with Graph Convolutional Networks (BGCN).
+
 [bundle_repro.py](bundle_repro.py) - Reproducibility runs of the graph bundle recommenders (official configs, equal-budget tuning, multiple seeds).

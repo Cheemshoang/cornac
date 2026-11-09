@@ -41,6 +41,11 @@ CrossCBR: Cross-view Contrastive Learning for Bundle Recommendation (CrossCBR)
 .. automodule:: cornac.models.crosscbr.recom_crosscbr
    :members:
 
+Bundle Recommendation with Graph Convolutional Networks (BGCN)
+--------------------------------------------------------------
+.. automodule:: cornac.models.bgcn.recom_bgcn
+   :members:
+
 Bilateral VAE for Collaborative Filtering (BiVAECF)
 ---------------------------------------------------
 .. automodule:: cornac.models.bivaecf.recom_bivaecf

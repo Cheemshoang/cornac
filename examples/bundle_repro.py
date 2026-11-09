@@ -64,6 +64,12 @@ CONFIGS = {
         "iFashion": dict(num_layers=1, lambda_reg=4e-5, item_dropout=0.2, bundle_dropout=0.2,
                          agg_dropout=0.0, c_lambda=0.25, c_temp=0.2, num_epochs=50),
     },
+    # The BGCN repository only configures NetEase; the same settings are used elsewhere.
+    "BGCN": {
+        dataset: dict(num_layers=2, learning_rate=3e-4, lambda_reg=1e-7, message_dropout=0.3,
+                      node_dropout=0.0, num_epochs=1000, eval_every=5, patience=10)
+        for dataset in ("Youshu", "NetEase", "iFashion")
+    },
 }
 
 # Published test Recall@20 / NDCG@20 of each model (Rule 2 reference check).
@@ -71,6 +77,8 @@ PAPER = {
     ("CrossCBR", "Youshu"): (0.2813, 0.1668),
     ("CrossCBR", "NetEase"): (0.0842, 0.0457),
     ("CrossCBR", "iFashion"): (0.1173, 0.0895),
+    ("BGCN", "Youshu"): (0.2347, 0.1345),
+    ("BGCN", "NetEase"): (0.0491, 0.0258),
 }
 
 # RandomSearch spaces (Rule 3), centred on the official settings.
@@ -82,6 +90,12 @@ SPACES = {
         Discrete("num_layers", [1, 2, 3]),
         Discrete("item_dropout", [0.0, 0.1, 0.2, 0.3]),
         Discrete("bundle_dropout", [0.0, 0.1, 0.2, 0.3]),
+    ],
+    "BGCN": [
+        Continuous("learning_rate", 1e-4, 3e-3),
+        Continuous("lambda_reg", 1e-8, 1e-4),
+        Discrete("message_dropout", [0.0, 0.1, 0.2, 0.3, 0.5]),
+        Discrete("num_layers", [1, 2, 3]),
     ],
 }
 
