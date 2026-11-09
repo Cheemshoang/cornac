@@ -152,7 +152,7 @@ PAPER = {
     ("BunCa", "Youshu"): (0.2978, 0.1762),
     ("BunCa", "NetEase"): (0.0899, 0.0479),
     ("BunCa", "iFashion"): (0.1431, 0.1123),
-    # BundleGT: as quoted by the BunCa paper (the SIGIR'23 paper was not accessible).
+    # BundleGT: Table 2 of the SIGIR'23 paper.
     ("BundleGT", "Youshu"): (0.2905, 0.1737),
     ("BundleGT", "NetEase"): (0.0903, 0.0478),
     ("BundleGT", "iFashion"): (0.1263, 0.0969),

@@ -72,3 +72,39 @@ def test_attention_training_switch(evaluation, official):
     optimizer.step()
     moved = not torch.equal(before, module.bundle_attn[0].query.weight)
     assert moved is (not official)
+
+
+def test_paper_and_official_residuals_differ(evaluation):
+    import torch
+
+    def forward(official):
+        model = tiny(official_variant=official)
+        model.rng = np.random.RandomState(0)
+        torch.manual_seed(0)
+        module = model._build_module(evaluation.train_set, torch.device("cpu"))
+        with torch.no_grad():
+            return module.forward_all()
+
+    paper_u, paper_b = forward(False)
+    code_u, code_b = forward(True)
+    # Same initialization, different residual sources (Eq. 9 and 14 vs released code).
+    assert not torch.allclose(paper_b, code_b)
+    assert not torch.allclose(paper_u, code_u)
+
+
+def test_paper_bundle_residual_aggregates_lightgcn_items(evaluation):
+    import torch
+
+    model = tiny(num_trans_layers=1, alpha=0.0)
+    model.rng = np.random.RandomState(0)
+    torch.manual_seed(0)
+    module = model._build_module(evaluation.train_set, torch.device("cpu"))
+    with torch.no_grad():
+        _, b = module.forward_all()
+        _, i_cf = module._ui_branch()
+        nb = module.num_bundles
+        b_u2b = torch.sparse.mm(module.ub_graph,
+                                torch.cat([module.users, module.bundles]))[module.num_users:]
+        bi = torch.sparse.mm(module.bi_graph, torch.cat([torch.zeros_like(module.bundles), i_cf]))
+    # alpha=0: b = sum_i norm * i^cf + UB message (Eq. 9-10).
+    np.testing.assert_allclose(b.numpy(), (bi[:nb] + b_u2b).numpy(), rtol=1e-4, atol=1e-6)

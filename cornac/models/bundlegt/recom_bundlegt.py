@@ -53,7 +53,8 @@ class BundleGT(BundleTorchRecommender):
         Weight of the attention pool against the graph message.
 
     gcn_norm: bool, default: False
-        Weight user-item layers by 1/(l+1) and L2-normalize them.
+        L2-normalize the propagated user-item layers before summing them with
+        the raw layer 0 (used for iFashion by the reference).
 
     num_epochs: int, default: 100
 
@@ -65,19 +66,26 @@ class BundleGT(BundleTorchRecommender):
         L2 weight on the user, bundle and item tables (no Adam weight decay).
 
     official_variant: bool, default: False
-        False trains the attention projections, as the paper describes. True
-        reproduces the released code, where they are never registered with the
-        optimizer and stay at their random initialization.
+        False follows the paper: trained attention projections (Eq. 6, 12), the
+        bundle residual aggregating the LightGCN items i^cf (Eq. 9), the user
+        residual aggregating the current layer's bundles b^(l) (Eq. 14) and L2
+        on all trainable parameters (Eq. 18). True reproduces the released code:
+        attention projections never registered with the optimizer (they stay at
+        their random initialization), both residuals taken as one-hop messages
+        from the previous layer, and L2 on the embedding tables only.
 
     eval_every, patience, eval_k, device, trainable, verbose, seed:
         See :class:`cornac.models.bundle_utils.BundleTorchRecommender`.
 
     Notes
     -----
-    Clean-room reimplementation from the paper; settings checked against
-    https://github.com/Xiaohao-Liu/BundleGT (commit d7779ec) and its issue #1
-    (NetEase and iFashion settings). Memory grows with
-    ``num_bundles * num_token`` and ``num_users * num_user_token``.
+    Reimplementation from the paper (Eq. 2-18). The released code
+    (https://github.com/Xiaohao-Liu/BundleGT, commit d7779ec) was also read to
+    obtain the settings in its run.sh and issue #1 and to build
+    ``official_variant``; it differs from the paper as listed above. The
+    per-user token limit is hard-coded in that code (70 Youshu, 30 NetEase,
+    5 iFashion). Memory grows with ``num_bundles * num_token`` and
+    ``num_users * num_user_token``.
 
     References
     ----------

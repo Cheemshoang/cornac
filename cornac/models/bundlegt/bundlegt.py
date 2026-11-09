@@ -70,12 +70,13 @@ class BundleGTModule(nn.Module):
         self.num_bundles = ub.shape[1]
         self.num_ui_layers, self.gcn_norm = num_ui_layers, gcn_norm
         self.alpha, self.lambda_reg = alpha, lambda_reg
+        self.official_variant = official_variant
 
         self.users = nn.Parameter(torch.empty(self.num_users, emb_size))
         self.bundles = nn.Parameter(torch.empty(self.num_bundles, emb_size))
         self.items = nn.Parameter(torch.empty(self.num_items, emb_size))
         for weight in (self.users, self.bundles, self.items):
-            nn.init.xavier_normal_(weight)
+            nn.init.xavier_uniform_(weight)
 
         trainable = not official_variant
         self.bundle_attn = nn.ModuleList(SetAttention(emb_size, trainable)
@@ -94,36 +95,60 @@ class BundleGTModule(nn.Module):
         self.user_mask = torch.as_tensor(user_mask, device=device)
 
     def _ui_branch(self):
-        weights = None
-        if self.gcn_norm:
-            weights = [1.0 / (layer + 1) for layer in range(self.num_ui_layers + 1)]
+        # gcn_norm: L2-normalized propagated layers summed with the raw layer 0 (the
+        # reference also divides by l+1, which the normalization cancels).
         feats = lightgcn_propagate(self.ui_graph, torch.cat([self.users, self.items]),
-                                   self.num_ui_layers, layer_weights=weights,
-                                   normalize=self.gcn_norm)
+                                   self.num_ui_layers, normalize=self.gcn_norm)
         return feats[: self.num_users], feats[self.num_users:]
 
+    @staticmethod
+    def _message(graph, left, right, to_left):
+        """One normalized message over a bipartite graph, from one side only."""
+        if to_left:
+            out = torch.sparse.mm(graph, torch.cat([torch.zeros_like(left), right]))
+            return out[: left.shape[0]]
+        out = torch.sparse.mm(graph, torch.cat([left, torch.zeros_like(right)]))
+        return out[left.shape[0]:]
+
     def forward_all(self):
+        """HGT layers (paper Eq. 4-15).
+
+        Paper: the bundle residual aggregates the LightGCN items i^cf (Eq. 9) and the
+        user residual aggregates the current layer's bundles b^(l) (Eq. 14).
+        Released code (official_variant): both residuals are one-hop messages taken at
+        the start of the layer, from the previous layer's items and bundles.
+        """
         nu, nb = self.num_users, self.num_bundles
         u_cf, i_cf = self._ui_branch()
         u, b, i = self.users, self.bundles, self.items
         for bundle_attn, user_attn in zip(self.bundle_attn, self.user_attn):
             ub = torch.sparse.mm(self.ub_graph, torch.cat([u, b]))
-            u_b2u, b_u2b = ub[:nu], ub[nu:]
+            u_b2u, b_u2b = ub[:nu], ub[nu:]               # messages from u^(l-1), b^(l-1)
             bi = torch.sparse.mm(self.bi_graph, torch.cat([b, i]))
             b_i2b, i_b2i = bi[:nb], bi[nb:]
-            i = i_cf + i_b2i
+            i = i_cf + i_b2i                                # Eq. 4-5: tokens + positions
             item_table = torch.cat([i, i.new_zeros(1, i.shape[1])])
             b_pool = bundle_attn(item_table[self.bundle_tokens], self.bundle_mask)
-            b = self.alpha * b_pool + (1 - self.alpha) * b_i2b + b_u2b
+            if not self.official_variant:                   # Eq. 9: aggregate i^cf
+                b_i2b = self._message(self.bi_graph, b, i_cf, to_left=True)
+            b = self.alpha * b_pool + (1 - self.alpha) * b_i2b + b_u2b  # Eq. 9-10
             bundle_table = torch.cat([b, b.new_zeros(1, b.shape[1])])
             u_pool = user_attn(bundle_table[self.user_tokens], self.user_mask)
-            u = self.alpha * u_pool + (1 - self.alpha) * u_b2u + u_cf
+            if not self.official_variant:                   # Eq. 14: aggregate b^(l)
+                u_b2u = self._message(self.ub_graph, u, b, to_left=True)
+            u = self.alpha * u_pool + (1 - self.alpha) * u_b2u + u_cf    # Eq. 14-15
         return u, b
 
     def loss(self, users, pos, neg):
         u, b = self.forward_all()
         bpr = bpr_loss((u[users] * b[pos]).sum(1), (u[users] * b[neg]).sum(1))
-        reg = self.users.pow(2).sum() + self.bundles.pow(2).sum() + self.items.pow(2).sum()
+        tables = (self.users, self.bundles, self.items)
+        if self.official_variant:  # released code: embedding tables only
+            params = tables
+        else:  # paper Eq. 18: all trainable parameters
+            params = tables + tuple(p for p in self.parameters() if p.requires_grad
+                                    and all(p is not t for t in tables))
+        reg = sum(p.pow(2).sum() for p in params)
         return bpr + self.lambda_reg * reg, {"bpr": bpr.item()}
 
     def embeddings(self):

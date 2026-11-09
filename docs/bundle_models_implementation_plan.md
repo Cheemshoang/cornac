@@ -73,7 +73,7 @@ Each model is also registered in four places:
 | 2 | **BGCN** (SIGIR'20) | Item graph `[[I,UI],[UIᵀ,I]]` and bundle graph with BB overlap; Linear+LeakyReLU layers concatenated with L2 normalization; message dropout; optional hard-negative stage (`hard_neg_ratio`) | Same in both |
 | 3 | **MultiCBR** (TOIS'24) | Three LightGCN views (UB/UI/BI) with fixed layer weights; noise augmentation; `modal_weight` fusion | Paper: InfoNCE between two augmented forward passes. Official: the code's self-contrast |
 | 4 | **BunCa** (ECML-PKDD'24) | Item-item co-occurrence (thresholds `iui`/`ibi`) from **training** UI/BI only; GATv2 multi-head layer in plain torch; coherent view (UP+BC) and cohesive view (UU/BB); cross and native contrast | Paper: residual on and all contrastive terms on. Official: the released `run.sh` weights |
-| 5 | **BundleGT** (SIGIR'23) | LightGCN on UI; transformer layers with masked attention over bundle→items (`num_token`) and user→bundles (`num_user_token`, as a parameter instead of hard-coded) | Paper: attention weights trained (`nn.ModuleList`). Official: weights left untrained |
+| 5 | **BundleGT** (SIGIR'23) | LightGCN on UI; transformer layers with masked attention over bundle→items (`num_token`) and user→bundles (`num_user_token`, as a parameter instead of hard-coded) | Paper: attention weights trained; bundle residual aggregates i^cf (Eq. 9); user residual aggregates b^(l) (Eq. 14); L2 on all parameters (Eq. 18). Official: attention untrained, both residuals from the previous layer, L2 on tables only |
 | 6 | **DCBR** (AAAI'25) | MultiCBR UI and BI views; DiffRec-style MLP diffusion over UB rows (ELBO + λ0·BLCC) with its own optimizer; UB rebuilt with top-`rebuild_k` per user; inter- and intra-view InfoNCE; score from UI+BI only | Same in both. Device follows the `device` argument (the official code hard-codes `.cuda()`) |
 
 Per-dataset default hyperparameters (Youshu, NetEase, iFashion) come from each repo's config, as
@@ -100,7 +100,7 @@ listed below. They go into the example scripts, not into class defaults.
     - BunCa: .2978/.1762, .0899/.0479, .1431/.1123
     - BGCN: Youshu .2347/.1345, NetEase .0491/.0258
     - DCBR: iFashion .1633/.1370
-    - BundleGT: approx. .2905/.1737, .0903/.0478, .1263/.0969 (from the BunCa table, unverified)
+    - BundleGT: .2905/.1737, .0903/.0478, .1263/.0969 (paper Table 2)
     - Run both variants and explain any gap.
 - **Rule 3 (tuning):** `RandomSearch` with the same `n_trails` and the same validation NDCG@20 for
   every trainable model: the new models plus the BPR, LightGCN, EASE and ItemKNN baselines.
