@@ -35,6 +35,7 @@ from .bpr import WBPR
 from .bpr import VEBPR
 from .bunca import BunCa
 from .bundle_pop import BundlePop
+from .bundlegt import BundleGT
 from .causalrec import CausalRec
 from .c2pf import C2PF
 from .cdl import CDL

@@ -161,7 +161,7 @@ All six use embedding size 64, lr 1e-3 and batch 2048, except where a row says o
 | 2 | BGCN | ✅ code + tests; Youshu smoke run OK (learns at lr 3e-3; official lr 3e-4 converges slowly, as the reference's 1000-epoch budget implies); full reproduction pending |
 | 3 | MultiCBR | ✅ code + tests (paper and official variants); Youshu smoke run (5 epochs) OK for both; full reproduction pending |
 | 4 | BunCa | ✅ code + tests (paper defaults; released switches via `bundle_repro.py --official`); Youshu smoke run (3 epochs, val R@20 0.233) OK; full reproduction pending |
-| 5 | BundleGT | ☐ |
+| 5 | BundleGT | ✅ code + tests (trained vs frozen attention); Youshu smoke run (3 epochs, test R@20 0.223) OK, ~200 s/epoch on CPU so GPU needed; full reproduction pending |
 | 6 | DCBR | ☐ |
 
 A phase is ticked only when all 11 rows of the pre-merge gate pass and the user approves.

@@ -56,6 +56,11 @@ Bundle Recommendation with Item-level Causation-enhanced Multi-view Learning (Bu
 .. automodule:: cornac.models.bunca.recom_bunca
    :members:
 
+Strategy-aware Bundle Recommender System (BundleGT)
+---------------------------------------------------
+.. automodule:: cornac.models.bundlegt.recom_bundlegt
+   :members:
+
 Bilateral VAE for Collaborative Filtering (BiVAECF)
 ---------------------------------------------------
 .. automodule:: cornac.models.bivaecf.recom_bivaecf

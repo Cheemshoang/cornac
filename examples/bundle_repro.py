@@ -100,6 +100,18 @@ CONFIGS = {
                          coherent_weights=(0.9, 0.9), cohesive_weights=(0.6, 0.6),
                          batch_size=12000, num_epochs=70),
     },
+    # Youshu from the repository's run.sh; NetEase and iFashion from its issue #1.
+    "BundleGT": {
+        "Youshu": dict(num_ui_layers=4, num_trans_layers=3, num_token=70, num_user_token=70,
+                       alpha=0.5, gcn_norm=False, lambda_reg=1e-5, num_epochs=1000,
+                       eval_every=10, patience=4),
+        "NetEase": dict(num_ui_layers=4, num_trans_layers=5, num_token=70, num_user_token=30,
+                        alpha=0.5, gcn_norm=False, lambda_reg=1e-6, num_epochs=1000,
+                        eval_every=5, patience=8),
+        "iFashion": dict(num_ui_layers=4, num_trans_layers=1, num_token=5, num_user_token=5,
+                         alpha=0.75, gcn_norm=True, lambda_reg=2e-6, num_epochs=1000,
+                         eval_every=2, patience=10),
+    },
 }
 
 # Released-code settings applied by --official on top of CONFIGS, for models whose
@@ -128,6 +140,10 @@ PAPER = {
     ("BunCa", "Youshu"): (0.2978, 0.1762),
     ("BunCa", "NetEase"): (0.0899, 0.0479),
     ("BunCa", "iFashion"): (0.1431, 0.1123),
+    # BundleGT: as quoted by the BunCa paper (the SIGIR'23 paper was not accessible).
+    ("BundleGT", "Youshu"): (0.2905, 0.1737),
+    ("BundleGT", "NetEase"): (0.0903, 0.0478),
+    ("BundleGT", "iFashion"): (0.1263, 0.0969),
 }
 
 # RandomSearch spaces (Rule 3), centred on the official settings.
@@ -162,6 +178,12 @@ SPACES = {
         Discrete("contrast_weights", [(0.5, 0.5, 0, 0), (0.25, 0.25, 0.25, 0.25),
                                       (0.3, 0.3, 0.2, 0.2)]),
         Discrete("hyper_threshold", [2, 4, 10000]),
+    ],
+    "BundleGT": [
+        Continuous("lambda_reg", 1e-7, 1e-4),
+        Discrete("num_trans_layers", [1, 2, 3, 5]),
+        Discrete("alpha", [0.25, 0.5, 0.75]),
+        Discrete("gcn_norm", [False, True]),
     ],
 }
 

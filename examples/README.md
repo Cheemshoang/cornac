@@ -166,4 +166,6 @@
 
 [bundle_bunca_youshu.py](bundle_bunca_youshu.py) - Example of Bundle Recommendation with Item-level Causation-enhanced Multi-view Learning (BunCa).
 
+[bundle_bundlegt_youshu.py](bundle_bundlegt_youshu.py) - Example of the Strategy-aware Bundle Recommender System (BundleGT).
+
 [bundle_repro.py](bundle_repro.py) - Reproducibility runs of the graph bundle recommenders (official configs, equal-budget tuning, multiple seeds).
