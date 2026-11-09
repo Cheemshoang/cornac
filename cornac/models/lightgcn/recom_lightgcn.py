@@ -193,6 +193,8 @@ class LightGCN(Recommender, ANNMixin):
             ):
                 break
 
+        return self
+
     def monitor_value(self, train_set, val_set):
         """Calculating monitored value used for early stopping on validation set (`val_set`).
         This function will be called by `early_stop()` function.
